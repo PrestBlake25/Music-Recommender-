@@ -82,30 +82,31 @@ def load_songs(csv_path: str) -> List[Dict]:
     return songs
 
 
-def score_song(user_prefs: Dict, song: Dict) -> Tuple[int, str]:
+def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, str]:
     """
     Scores a single song against user preferences.
 
     The function is intentionally simple and transparent:
-    - genre match: +4
-    - mood match: +3
+    - genre match: +2
+    - mood match: +4
     - energy close match (<= 0.15): +2
     - energy near match (<= 0.30): +1
     - acoustic preference match: +1
+    - energy proximity bonus: up to +0.99 for closer matches
     """
-    score = 0
+    score = 0.0
     reasons: List[str] = []
 
     pref_genre = (user_prefs.get("genre") or user_prefs.get("favorite_genre") or "").strip().lower()
     song_genre = str(song.get("genre", "")).strip().lower()
     if pref_genre and song_genre == pref_genre:
-        score += 4
+        score += 2
         reasons.append("genre match")
 
     pref_mood = (user_prefs.get("mood") or user_prefs.get("favorite_mood") or "").strip().lower()
     song_mood = str(song.get("mood", "")).strip().lower()
     if pref_mood and song_mood == pref_mood:
-        score += 3
+        score += 4
         reasons.append("mood match")
 
     target_energy = user_prefs.get("energy")
@@ -120,6 +121,11 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[int, str]:
             score += 1
             reasons.append("energy close")
 
+        # Add a small continuous bonus so ties are less frequent in output.
+        if diff <= 0.30:
+            proximity_bonus = (0.30 - diff) / 0.30
+            score += round(proximity_bonus, 2)
+
     likes_acoustic = user_prefs.get("likes_acoustic")
     if likes_acoustic is not None and "acousticness" in song:
         acoustic = float(song["acousticness"])
@@ -133,12 +139,12 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[int, str]:
     explanation = ", ".join(reasons) if reasons else "No strong preference matches"
     return score, explanation
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, int, str]]:
+def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
     """
     Functional implementation of the recommendation logic.
     Required by src/main.py
     """
-    scored: List[Tuple[Dict, int, str]] = []
+    scored: List[Tuple[Dict, float, str]] = []
 
     for song in songs:
         score, explanation = score_song(user_prefs, song)

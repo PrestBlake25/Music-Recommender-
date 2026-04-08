@@ -21,44 +21,69 @@ def main() -> None:
     songs = load_songs("data/songs.csv") 
     print(f"Loaded {len(songs)} songs.")
 
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
-    my_taste = {
-        "preferred_genres": ["hip-hop", "rock", "lofi"],
-        "target": {
-            "energy": 0.75,
-            "tempo_bpm": 115,
-            "valence": 0.60,
-            "danceability": 0.70,
-            "acousticness": 0.25
+    # Sample user preference profiles for quick experimentation.
+    user_profiles = {
+        "High-Energy Pop": {
+            "genre": "pop",
+            "mood": "happy",
+            "energy": 0.85,
+            "likes_acoustic": False,
         },
-        "weights": {
-            "genre": 0.25,
-            "mood": 0.10,
-            "energy": 0.25,
-            "tempo_bpm": 0.15,
-            "valence": 0.10,
-            "danceability": 0.10,
-            "acousticness": 0.05
+        "Chill Lofi": {
+            "genre": "lofi",
+            "mood": "chill",
+            "energy": 0.35,
+            "likes_acoustic": True,
+        },
+        "Deep Intense Rock": {
+            "genre": "rock",
+            "mood": "intense",
+            "energy": 0.9,
+            "likes_acoustic": False,
+        },
+        "Rock But Calm Mood Clash": {
+            "genre": "rock",
+            "mood": "peaceful",
+            "energy": 0.92,
+            "likes_acoustic": True
+        },
+        "Ultra-Low Energy Party Ask": {
+            "genre": "electronic",
+            "mood": "energetic",
+            "energy": 0.05,
+            "likes_acoustic": False
+        },
+        "Acoustic Contradiction Profile": {
+            "genre": "lofi",
+            "mood": "chill",
+            "energy": 0.35,
+            "likes_acoustic": False
         }
     }
-    recommendations = recommend_songs(user_prefs, songs, k=5)
 
-    print("\nTop recommendations:\n")
-    for rank, rec in enumerate(recommendations, start=1):
-        # The recommender returns (song, score, explanation).
-        song, score, explanation = rec
-        reasons = [] if explanation == "No strong preference matches" else [r.strip() for r in explanation.split(",")]
+    # Loop through each profile and show top 5 recommendations
+    for profile_name, user_prefs in user_profiles.items():
+        print(f"\n{'='*70}")
+        print(f"Profile: {profile_name}")
+        print(f"Preferences: {user_prefs}")
+        print(f"{'='*70}\n")
 
-        print(f"{rank}. {song['title']}")
-        print(f"   Final Score: {score:.2f}")
-        if reasons:
-            print("   Reasons:")
-            for reason in reasons:
-                print(f"   - {reason}")
-        else:
-            print("   Reasons: No strong preference matches")
-        print()
+        recommendations = recommend_songs(user_prefs, songs, k=5)
+
+        print("Top 5 recommendations:\n")
+        for rank, rec in enumerate(recommendations, start=1):
+            # The recommender returns (song, score, explanation).
+            song, score, explanation = rec
+            reasons = [] if explanation == "No strong preference matches" else [r.strip() for r in explanation.split(",")]
+
+            print(f"{rank}. {song['title']} by {song['artist']}")
+            print(f"   Score: {score}")
+            print(f"   Genre: {song['genre']}, Mood: {song['mood']}, Energy: {song['energy']}")
+            if reasons:
+                print(f"   Match: {', '.join(reasons)}")
+            else:
+                print("   Match: No strong preference matches")
+            print()
 
 
 if __name__ == "__main__":

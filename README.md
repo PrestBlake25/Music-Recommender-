@@ -43,8 +43,18 @@ This recommender follows a simple Input -> Process -> Output pipeline.
 - The output is a ranked recommendation list.
 
 
-<img src="Recommendations.png">
+## My User Profile Recommendations
+<img src="Recommendations.png">  
 
+
+## Other User Profiles Recommendations
+<div style="display:flex">
+   <img src="ProfileImages/Profile1.png" style="margin: 10px; max-width: 200px;">
+   <img src="ProfileImages/Profile2.png" style="margin: 10px; max-width: 200px;">
+   <img src="ProfileImages/Profile3.png" style="margin: 10px; max-width: 200px;">
+   <img src="ProfileImages/Profile4.png" style="margin: 10px; max-width: 200px;">
+   <img src="ProfileImages/Profile5.png" style="margin: 10px; max-width: 200px;">
+</div>
 
 ---
 
@@ -85,12 +95,18 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+**Swapped the weights for genre and mood matching (Experiment 1)**
+   - Changed genre match from +4 → +2
+   - Changed mood match from +3 → +4
+   - **Result:** Mood became the dominant factor. Songs that matched the user's mood preference now ranked higher even if the genre didn't align perfectly. For example, "Gym Hero" (intense mood, pop genre) ranked higher in the High-Energy Pop profile because it prioritized mood over genre. This experiment showed how weighting preferences directly influences which songs bubble to the top.
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
 
+   - **High-Energy Pop:** Most balanced "mainstream upbeat" profile. It consistently pulls happy, high-energy songs, with "Sunrise City" as a strong all-around match.
+   - **Chill Lofi:** Most consistent profile overall. It gets many exact matches (genre + mood + energy + acoustic), so scores are high and rankings feel very stable.
+   - **Deep Intense Rock:** Most aggressive high-energy profile. It stands out by prioritizing intense mood and non-acoustic tracks, often surfacing rock/adjacent workout songs.
+   - **Rock But Calm Mood Clash:** Most conflicted profile. It mixes rock + peaceful + very high energy + acoustic, so results look less coherent and reveal trade-offs in the scoring logic.
+   - **Ultra-Low Energy Party Ask:** Most unrealistic combination. It asks for very low energy plus energetic mood, so after one strong exact genre/mood match, ranking quality drops quickly.
+   - **Acoustic Contradiction Profile:** Best test of acoustic preference impact. It is close to Chill Lofi but flips likes_acoustic to False, showing how a single preference changes scores without fully changing top songs.
 ---
 
 ## Limitations and Risks
